@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} %-5level %thread %logger{36} %file:%line - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="ru.itx" level="DEBUG"/>
+	<logger name="org.freeswitch.esl.client.inbound.InboundClientHandler" level="OFF"/>
+
+	<root level="OFF">
+		<appender-ref ref="stdout"/>
+	</root>
+
+</configuration>

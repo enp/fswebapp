@@ -24,6 +24,8 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 import org.freeswitch.esl.client.inbound.Client;
 import org.freeswitch.esl.client.transport.message.EslMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,18 +34,32 @@ import java.util.List;
 
 public class Application {
 
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	private Client fs;
+	private HttpServer server;
 
 	public Application() throws Exception {
+		logger.info("starting freeswitch client ...");
 		fs = new Client();
 		fs.connect("pbx", 8021, "ClueCon", 2);
-		HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+		logger.info("starting http server ...");
+		server = HttpServer.create(new InetSocketAddress(8080), 0);
 		server.createContext("/", new Handler());
 		server.start();
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				logger.info("stopping http server ...");
+				server.stop(0);
+				logger.info("stopping freeswitch client ...");
+				fs.close();
+			}
+		});
 	}
 
 	private class Handler implements HttpHandler {
 		public void handle(HttpExchange request) throws IOException {
+			logger.info("http request received from "+request.getRemoteAddress());
 			EslMessage message = fs.sendSyncApiCommand("sofia", "xmlstatus profile stc");
 			String messageBody = "", htmlUsers = "";
 			for (String messageBodyLine : message.getBodyLines())
