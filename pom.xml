@@ -5,7 +5,7 @@
 	<artifactId>fswebapp</artifactId>
 	<packaging>jar</packaging>
 	<version>0.1</version>
-	<name>fswebapp</name>
+	<name>FreeSWITCH Web Application</name>
 	<url>http://www.itx.ru</url>
 	<developers>
 		<developer>

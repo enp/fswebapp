@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Eugene Prokopiev <enp@itx.ru>
+ * Copyright (c) 2011 Eugene Prokopiev <enp@itx.ru>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,37 @@
 
 package ru.itx.fswebapp;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpHandler;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.util.Date;
+
 public class Application {
 
-	public static void main(String[] args) throws Exception {
-		System.out.println("fswebapp application");
+	private static class Handler implements HttpHandler {
+		public void handle(HttpExchange request) throws IOException {
+			String response =
+				"<html><head>"+
+				"<meta content=\"text/html; charset=UTF-8\" http-equiv=\"content-type\">"+
+				"<meta http-equiv=\"refresh\" content=\"5; url=/\">"+
+				"<title>Test page</title>"+
+				"</head><body>"+
+				"<b>current date/time - "+new Date()+"</b>"+
+				"</body></html>";
+			request.sendResponseHeaders(200, response.length());
+			OutputStream os = request.getResponseBody();
+			os.write(response.getBytes());
+			os.close();
+		}
+	}
+
+    public static void main(String[] args) throws Exception {
+		HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+		server.createContext("/", new Handler());
+		server.start();
 	}
 }
